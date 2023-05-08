@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Email Scheduler Form</title>
+</head>
+<body>
+	<h1>Email Scheduler</h1>
+	<form>
+		<label for="subject">Email Subject:</label>
+		<input type="text" id="subject" name="subject"><br><br>
+		<label for="text">Email Text:</label><br>
+		<textarea id="text" name="text" rows="4" cols="50"></textarea><br><br>
+		<label for="schedule">Schedule a Time:</label>
+		<input type="datetime-local" id="schedule" name="schedule"><br><br>
+		<input type="button" value="Schedule Email" onclick="scheduleEmail()">
+	</form>
+
+	<script>
+		function scheduleEmail() {
+			// Get the form data
+			const subject = document.getElementById('subject').value;
+			const text = document.getElementById('text').value;
+			const schedule = document.getElementById('schedule').value;
+
+			// Validate the form data
+			if (subject.trim() === '') {
+				alert('Please enter an email subject');
+				return;
+			}
+
+			if (text.trim() === '') {
+				alert('Please enter email text');
+				return;
+			}
+
+			if (schedule.trim() === '') {
+				alert('Please select a scheduled time');
+				return;
+			}
+
+			// Convert the scheduled time to a UTC timestamp
+			const scheduledTime = Date.parse(schedule);
+
+			// Get the current UTC timestamp
+			const currentTime = Date.now();
+
+			// Calculate the delay in milliseconds
+			const delay = scheduledTime - currentTime;
+
+			// Schedule the email to be sent
+			setTimeout(function() {
+				sendEmail(subject, text);
+			}, delay);
+
+			// Show a success message
+			alert('Email scheduled successfully');
+		}
+
+		function sendEmail(subject, text) {
+			// Send the email using an AJAX request
+			const xhr = new XMLHttpRequest();
+			xhr.open('POST', '/send-email');
+			xhr.setRequestHeader('Content-Type', 'application/json');
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState === XMLHttpRequest.DONE) {
+					console.log(xhr.responseText);
+				}
+			};
+			const data = {
+				subject: subject,
+				text: text
+			};
+			xhr.send(JSON.stringify(data));
+		}
+	</script>
+</body>
+</html>
